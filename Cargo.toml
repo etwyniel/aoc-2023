@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-aoc-framework = {path = "../aoc-framework"}
-aoc-derive = {path = "../aoc-derive"}
+aoc-framework = { git = "https://github.com/etwyniel/aoc-framework" }
 fxhash = "0.2.1"
 itertools = "0.10.5"

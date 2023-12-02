@@ -1,4 +1,3 @@
-use aoc_derive::aoc;
 use aoc_framework::*;
 
 pub struct Day01;
@@ -18,16 +17,15 @@ fn find_digit(mut it: impl Iterator<Item = u8>) -> Option<u8> {
 }
 
 #[aoc(part = 1)]
-fn part1(input: impl Iterator<Item = String>) -> anyhow::Result<u64> {
-    let res = input
+fn part1(input: impl Iterator<Item = String>) -> u64 {
+    input
         .map(|line| {
             find_digit(line.bytes())
                 .into_iter()
                 .chain(find_digit(line.bytes().rev()))
                 .fold(0, |acc, val| acc * 10 + val as u64)
         })
-        .sum();
-    Ok(res)
+        .sum()
 }
 
 fn match_digit(s: &str) -> Option<u8> {
@@ -46,8 +44,8 @@ fn match_digit(s: &str) -> Option<u8> {
 }
 
 #[aoc(part = 2, example = 281)]
-fn part2(input: impl Iterator<Item = String>) -> anyhow::Result<Answer> {
-    let res = input
+fn part2(input: impl Iterator<Item = String>) -> u64 {
+    input
         .map(|line| {
             let mut l = None;
             let mut r = None;
@@ -69,6 +67,5 @@ fn part2(input: impl Iterator<Item = String>) -> anyhow::Result<Answer> {
             }
             0
         })
-        .sum();
-    Ok(Num(res))
+        .sum()
 }

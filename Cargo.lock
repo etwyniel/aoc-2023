@@ -27,17 +27,27 @@ checksum = "a4668cab20f66d8d020e1fbc0ebe47217433c1b6c8f2040faf858554e394ace6"
 name = "aoc-2023"
 version = "0.1.0"
 dependencies = [
- "aoc-derive",
  "aoc-framework",
  "fxhash",
  "itertools",
 ]
 
 [[package]]
+name = "aoc-base"
+version = "0.1.0"
+source = "git+https://github.com/etwyniel/aoc-framework#4b2931c0445e09ddc070e21b5682d3bc6a90144c"
+dependencies = [
+ "anyhow",
+ "itertools",
+ "reqwest",
+]
+
+[[package]]
 name = "aoc-derive"
 version = "0.1.0"
+source = "git+https://github.com/etwyniel/aoc-framework#4b2931c0445e09ddc070e21b5682d3bc6a90144c"
 dependencies = [
- "aoc-framework",
+ "aoc-base",
  "proc-macro2",
  "quote",
  "syn",
@@ -46,8 +56,11 @@ dependencies = [
 [[package]]
 name = "aoc-framework"
 version = "0.1.0"
+source = "git+https://github.com/etwyniel/aoc-framework#4b2931c0445e09ddc070e21b5682d3bc6a90144c"
 dependencies = [
  "anyhow",
+ "aoc-base",
+ "aoc-derive",
  "itertools",
  "reqwest",
 ]

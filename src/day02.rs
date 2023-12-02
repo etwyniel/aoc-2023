@@ -1,4 +1,3 @@
-use aoc_derive::aoc;
 use aoc_framework::*;
 
 pub struct Day02;
