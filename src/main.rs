@@ -14,22 +14,25 @@ use day03::Day03;
 mod day04;
 use day04::Day04;
 
-fn main() -> anyhow::Result<()> {
-    let days = [Day01::run, Day02::run, Day03::run, Day04::run];
+mod day05;
+use day05::Day05;
 
-    let token = std::env::var("AOC_TOKEN")?;
+fn main() -> anyhow::Result<()> {
+    let days = [Day01::run, Day02::run, Day03::run, Day04::run, Day05::run];
+
+    let token = std::env::var("AOC_TOKEN").ok();
 
     if let Some(day) = args()
         .nth(1)
         .and_then(|arg| arg.parse::<usize>().ok())
         .and_then(|day| days.get(day - 1))
     {
-        day(&token);
+        day(token.as_deref());
         return Ok(());
     }
 
     for day in days {
-        day(&token);
+        day(token.as_deref());
     }
 
     Ok(())
