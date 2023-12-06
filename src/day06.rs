@@ -15,10 +15,11 @@ struct Race {
 
 impl Race {
     fn count_ways(self) -> u64 {
-        (1..self.time)
-            .map(|t| t * (self.time - t))
-            .filter(|&d| d > self.dist)
-            .count() as u64
+        let discr = self.time.pow(2) - 4 * self.dist;
+        let discr_root = (discr as f64).sqrt();
+        let r1 = (-(self.time as f64) + discr_root) / -2. + 0.0001;
+        let r2 = (-(self.time as f64) - discr_root) / -2. - 0.0001;
+        (r2.floor() as u64 - r1.ceil() as u64) + 1
     }
 }
 
