@@ -102,16 +102,8 @@ impl Hand {
         }
         let n_j = cards[12];
         cards[12] = 0;
-        let (max_pos, &max) = cards.iter().enumerate().max_by_key(|(_, n)| *n).unwrap();
-        if max >= 2 {
-            cards[max_pos] += n_j;
-            return;
-        }
-        if n_j == 5 {
-            cards[0] = n_j;
-            return;
-        }
-        *cards.into_iter().filter(|n| **n > 0).next().unwrap() += n_j;
+        let (max_pos, _) = cards.iter().enumerate().max_by_key(|(_, n)| *n).unwrap();
+        cards[max_pos] += n_j;
     }
 
     fn parse<const PART2: bool>(s: &str) -> Option<Hand> {
