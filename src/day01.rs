@@ -3,6 +3,12 @@ use aoc_framework::*;
 pub struct Day01;
 
 impl_day!(Day01::{part1, part2}: 2023[1], r"
+1abc2
+pqr3stu8vwx
+a1b2c3d4e5f
+treb7uchet
+",
+r"
 two1nine
 eightwothree
 abcone2threexyz
@@ -16,7 +22,7 @@ fn find_digit(mut it: impl Iterator<Item = u8>) -> Option<u8> {
     it.find(|b| b.is_ascii_digit()).map(|b| b - b'0')
 }
 
-#[aoc(part = 1)]
+#[aoc(part = 1, example = 142)]
 fn part1(input: impl Iterator<Item = String>) -> u64 {
     input
         .map(|line| {

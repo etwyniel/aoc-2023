@@ -1,10 +1,21 @@
-use std::collections::HashMap;
+use std::{array, collections::HashMap};
 
 use aoc_framework::*;
 
 pub struct Day08;
 
 impl_day!(Day08::{part1, part2}: 2023[8], r"
+RL
+
+AAA = (BBB, CCC)
+BBB = (DDD, EEE)
+CCC = (ZZZ, GGG)
+DDD = (DDD, DDD)
+EEE = (EEE, EEE)
+GGG = (GGG, GGG)
+ZZZ = (ZZZ, ZZZ)
+",
+r"
 LR
 
 11A = (11B, XXX)
@@ -31,11 +42,13 @@ struct MapEntry {
 
 fn parse_id(s: &str) -> u32 {
     s.bytes()
-        .map(|b| match b {
-            b'A'..=b'Z' => b - b'A',
-            b'0'..=b'9' => b - b'0' + 26,
-            _ => 0,
-        } as u32)
+        .flat_map(|b| {
+            Some(match b {
+                b'A'..=b'Z' => b - b'A',
+                b'0'..=b'9' => b - b'0' + 26,
+                _ => return None,
+            } as u32)
+        })
         .fold(0, |acc, n| acc * 36 + n)
 }
 
@@ -45,33 +58,21 @@ fn parse_map(input: impl Iterator<Item = String>) -> Vec<MapEntry> {
         .flat_map(|(i, ln)| {
             let (src, dsts) = ln.split_once(" = ")?;
             let src = parse_id(src);
-            let (l, r) = dsts
-                .trim_start_matches('(')
-                .trim_end_matches(')')
-                .split(", ")
-                .map(parse_id)
-                .tuples()
-                .next()?;
+            let (l, r) = dsts.split(", ").map(parse_id).tuples().next()?;
             Some((src, (i, [l, r])))
         })
         .collect::<HashMap<_, _>>();
     let mut simplified_map = vec![MapEntry::default(); map.len()];
-    map.iter().enumerate().for_each(|(i, (k, &(pos, [l, r])))| {
+    map.iter().enumerate().for_each(|(i, (k, &(pos, dests)))| {
         simplified_map[pos] = MapEntry {
             id: Id {
                 id: *k,
                 ndx: i as u32,
             },
-            dests: [
-                Id {
-                    id: l,
-                    ndx: map[&l].0 as u32,
-                },
-                Id {
-                    id: r,
-                    ndx: map[&r].0 as u32,
-                },
-            ],
+            dests: array::from_fn(|i| Id {
+                id: dests[i],
+                ndx: map[&dests[i]].0 as u32,
+            }),
         };
     });
     simplified_map
@@ -96,7 +97,7 @@ fn count_steps<F: Fn(u32) -> bool>(
     i as u64
 }
 
-#[aoc(part = 1)]
+#[aoc(part = 1, example = 2)]
 fn part1(mut input: impl Iterator<Item = String>) -> u64 {
     let mut directions = input.next().unwrap().into_bytes();
     directions
