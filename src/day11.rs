@@ -15,7 +15,11 @@ impl_day!(Day11::{part1, part2}: 2023[11], r"
 #...#.....
 ");
 
-fn solve(input: Vec<u8>, added_dist: u64) -> u64 {
+fn expand(pos: isize, mask: &[bool], added: isize) -> isize {
+    pos + mask.iter().take(pos as usize).filter(|&&b| b).count() as isize * added
+}
+
+fn solve(input: Vec<u8>, added_dist: isize) -> u64 {
     let grid = Grid::from_bytes(input);
     let mut galaxies = Vec::new();
     let size = grid.size();
@@ -33,34 +37,22 @@ fn solve(input: Vec<u8>, added_dist: u64) -> u64 {
     }
     galaxies
         .into_iter()
-        .tuple_combinations()
-        .map(|(p1, p2)| {
-            let mut len = 0;
-            for y in p1.y().min(p2.y())..p1.y().max(p2.y()) {
-                if doubled_rows[y as usize] {
-                    len += added_dist;
-                } else {
-                    len += 1;
-                }
-            }
-            for x in p1.x().min(p2.x())..p1.x().max(p2.x()) {
-                if doubled_cols[x as usize] {
-                    len += added_dist;
-                } else {
-                    len += 1;
-                }
-            }
-            len
+        .map(|p| {
+            let new_y = expand(p.y(), &doubled_rows, added_dist);
+            let new_x = expand(p.x(), &doubled_cols, added_dist);
+            Point2::new(new_x, new_y)
         })
-        .sum()
+        .tuple_combinations()
+        .map(|(p1, p2)| p1.dist_manhattan(p2))
+        .sum::<usize>() as u64
 }
 
 #[aoc(part = 1, example = 374)]
 fn part1(input: Vec<u8>) -> u64 {
-    solve(input, 2)
+    solve(input, 1)
 }
 
 #[aoc(part = 2)]
 fn part2(input: Vec<u8>) -> u64 {
-    solve(input, 1000000)
+    solve(input, 999999)
 }
