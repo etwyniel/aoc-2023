@@ -30,24 +30,21 @@ fn mirror(line: isize, max: isize) -> impl Iterator<Item = (isize, isize)> {
     (0..line).rev().zip(line..max)
 }
 
-fn col_reflects<F: FnMut(bool, bool) -> bool>(g: &GridView, x: isize, mut f: F) -> bool {
+fn col_reflects(g: &GridView, x: isize, mut f: impl FnMut(bool, bool) -> bool) -> bool {
     let Point([w, h]) = g.size();
     (0..h).all(|y| mirror(x, w).all(|(l, r)| f(g[(l, y)], g[(r, y)])))
 }
 
-fn row_reflects<F: FnMut(bool, bool) -> bool>(g: &GridView, y: isize, mut f: F) -> bool {
+fn row_reflects(g: &GridView, y: isize, mut f: impl FnMut(bool, bool) -> bool) -> bool {
     let Point([w, h]) = g.size();
     (0..w).all(|x| mirror(y, h).all(|(l, r)| f(g[(x, l)], g[(x, r)])))
 }
 
 fn find_reflection(g: &GridView) -> u64 {
+    let eq = |l, r| l == r;
     let Point([w, h]) = g.size();
-    let horizontal = (1..w)
-        .find(|&x| col_reflects(g, x, |l, r| l == r))
-        .unwrap_or(0);
-    let vertical = (1..h)
-        .find(|&y| row_reflects(g, y, |l, r| l == r))
-        .unwrap_or(0);
+    let horizontal = (1..w).find(|&x| col_reflects(g, x, eq)).unwrap_or(0);
+    let vertical = (1..h).find(|&y| row_reflects(g, y, eq)).unwrap_or(0);
     (horizontal + vertical * 100) as u64
 }
 
@@ -75,7 +72,7 @@ fn find_reflection_smudged(g: &GridView) -> u64 {
     (horizontal + vertical * 100) as u64
 }
 
-fn solve<F: Fn(&GridView) -> u64>(mut input: impl Iterator<Item = String>, f: F) -> u64 {
+fn solve(mut input: impl Iterator<Item = String>, f: impl Fn(&GridView) -> u64) -> u64 {
     let mut total = 0;
     loop {
         let mut data = Vec::new();
