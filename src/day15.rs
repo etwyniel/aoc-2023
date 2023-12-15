@@ -29,19 +29,18 @@ fn part2(input: impl Iterator<Item = String>) -> u64 {
             } else {
                 &step[..len - 2]
             };
-            let (h, mut label_num) = label.bytes().fold((0, 0), |(hash, label), b| {
-                (((hash + b as u64) * 17) % 256, label * 0x100 + b as u64)
+            let (h, label_num) = label.bytes().fold((0, 0), |(hash, label), b| {
+                (((hash + b as u64) * 17) % 256, (label << 8) + b as u64)
             });
-            label_num *= 0x100;
             let v = &mut map[h as usize];
-            let ndx = v.iter().position(|entry| entry & (!0xff) == label_num);
+            let ndx = v.iter().position(|entry| entry >> 8 == label_num);
             if op == b'-' {
                 if let Some(ndx) = ndx {
                     v.remove(ndx);
                 }
             } else {
                 let val = op - b'0';
-                let entry = label_num | val as u64;
+                let entry = label_num << 8 | val as u64;
                 if let Some(ndx) = ndx {
                     v[ndx] = entry;
                 } else {
