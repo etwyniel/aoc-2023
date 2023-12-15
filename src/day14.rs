@@ -28,23 +28,18 @@ fn part1(input: Vec<u8>) -> u64 {
     for x in 0..w {
         let mut wall = -1;
         let mut n_rocks = 0;
-        for y in 0..h {
-            let b = g[(x, y)];
-            if b == b'O' {
-                n_rocks += 1;
-                continue;
+        for y in 0..=h {
+            match g.get(Point([x, y])) {
+                Some(b'O') => n_rocks += 1,
+                None | Some(b'#') => {
+                    for i in 0..n_rocks {
+                        load += h - wall - i - 1;
+                    }
+                    n_rocks = 0;
+                    wall = y;
+                }
+                _ => (),
             }
-            if b == b'.' {
-                continue;
-            }
-            for i in 0..n_rocks {
-                load += h - wall - i - 1;
-            }
-            n_rocks = 0;
-            wall = y;
-        }
-        for i in 0..n_rocks {
-            load += h - wall - i - 1;
         }
     }
     load as u64
@@ -53,8 +48,8 @@ fn part1(input: Vec<u8>) -> u64 {
 fn calc_load(g: &GridView<'_, u8, 2>) -> u64 {
     let Point([w, h]) = g.size();
     let mut load = 0;
-    for x in 0..w {
-        for y in 0..h {
+    for y in 0..h {
+        for x in 0..w {
             let b = g[(x, y)];
             if b == b'.' || b == b'#' {
                 continue;
@@ -73,24 +68,23 @@ const DIRECTIONS: [Direction<2>; 4] = [
 ];
 
 fn run_cycle(g: &mut GridView<'_, u8, 2>) -> u64 {
+    let size = g.size();
     for dir_i in DIRECTIONS {
         let delta_i = dir_i.delta();
         let dir_j = dir_i + 1;
         let delta_j = dir_j.delta();
-        let mut pj = dir_j.edge(g.size());
-        while g.in_bounds(pj) {
-            let mut pi = dir_i.edge(g.size());
+        let mut pj = dir_j.edge(size);
+        for _ in 0..size.len_in_dir(dir_j) {
+            let mut pos = pj + dir_i.edge(size);
             let mut last_empty = None;
-            while g.in_bounds(pi) {
-                let pos = pj + pi;
+            for _ in 0..size.len_in_dir(dir_i) {
                 match g[pos] {
                     b'#' => {
                         last_empty = None;
                     }
-                    b'.' if last_empty.is_none() => {
-                        last_empty = Some(pos);
+                    b'.' => {
+                        last_empty.get_or_insert(pos);
                     }
-                    b'.' => (),
                     _ => {
                         if let Some(empty) = last_empty {
                             g.set(empty, b'O');
@@ -99,7 +93,7 @@ fn run_cycle(g: &mut GridView<'_, u8, 2>) -> u64 {
                         }
                     }
                 }
-                pi += delta_i;
+                pos += delta_i;
             }
             pj += delta_j;
         }
@@ -122,22 +116,17 @@ fn find_cycle(values: &[u64]) -> Option<usize> {
 
 #[aoc(part = 2, example = 64)]
 fn part2(input: Vec<u8>) -> u64 {
-    let grid = Grid::from_bytes(input);
-    let mut grid = grid.clone();
+    let mut grid = Grid::from_bytes(input);
     let mut values = Vec::new();
     let mut i = 0;
     const TARGET: usize = 1_000_000_000;
-    let mut cycle_found = false;
     while i < TARGET {
         values.push(run_cycle(&mut grid));
-        if !cycle_found {
-            if let Some(len) = find_cycle(&values) {
-                i += len * ((TARGET - i) / len) + 1;
-                cycle_found = true;
-                continue;
-            }
+        if let Some(len) = find_cycle(&values) {
+            i += len * ((TARGET - i) / len) + 1;
+            return values[values.len() - len - 1..][TARGET - i];
         }
         i += 1;
     }
-    calc_load(&grid)
+    0
 }

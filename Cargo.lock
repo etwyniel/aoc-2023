@@ -30,12 +30,13 @@ dependencies = [
  "aoc-framework",
  "fxhash",
  "itertools",
+ "smallvec",
 ]
 
 [[package]]
 name = "aoc-base"
 version = "0.1.0"
-source = "git+https://github.com/etwyniel/aoc-framework#3eb6e4b65d2acef7db3d60047ea5caf500a5614b"
+source = "git+https://github.com/etwyniel/aoc-framework#e6c0152e248eb8a47dcd9d001d77a9c88b8d4154"
 dependencies = [
  "anyhow",
  "itertools",
@@ -45,7 +46,7 @@ dependencies = [
 [[package]]
 name = "aoc-derive"
 version = "0.1.0"
-source = "git+https://github.com/etwyniel/aoc-framework#3eb6e4b65d2acef7db3d60047ea5caf500a5614b"
+source = "git+https://github.com/etwyniel/aoc-framework#e6c0152e248eb8a47dcd9d001d77a9c88b8d4154"
 dependencies = [
  "aoc-base",
  "proc-macro2",
@@ -56,7 +57,7 @@ dependencies = [
 [[package]]
 name = "aoc-framework"
 version = "0.1.0"
-source = "git+https://github.com/etwyniel/aoc-framework#3eb6e4b65d2acef7db3d60047ea5caf500a5614b"
+source = "git+https://github.com/etwyniel/aoc-framework#e6c0152e248eb8a47dcd9d001d77a9c88b8d4154"
 dependencies = [
  "anyhow",
  "aoc-base",
@@ -863,6 +864,12 @@ checksum = "8f92a496fb766b417c996b9c5e57daf2f7ad3b0bebe1ccfca4856390e3d3bb67"
 dependencies = [
  "autocfg",
 ]
+
+[[package]]
+name = "smallvec"
+version = "1.11.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4dccd0940a2dcdf68d092b8cbab7dc0ad8fa938bf95787e1b916b0e3d0e8e970"
 
 [[package]]
 name = "socket2"

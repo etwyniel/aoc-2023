@@ -96,25 +96,22 @@ impl Hand {
         })
     }
 
-    fn change_jokers(cards: &mut [u8]) {
-        if cards[12] == 0 {
-            return;
-        }
-        let n_j = cards[12];
-        cards[12] = 0;
-        let (max_pos, _) = cards.iter().enumerate().max_by_key(|(_, n)| *n).unwrap();
-        cards[max_pos] += n_j;
+    fn change_jokers(cards: &mut [u8; 13]) {
+        let jokers_in_hand = &mut cards[12];
+        let number_of_jokers = *jokers_in_hand;
+        *jokers_in_hand = 0;
+        *cards.iter_mut().max().unwrap() += number_of_jokers;
     }
 
     fn parse<const PART2: bool>(s: &str) -> Option<Hand> {
         let (hand, bid) = s.split_once(' ')?;
         let mut cards = [0; 13];
-        let mut value = 0;
-        hand.bytes()
+        let value = hand
+            .bytes()
             .flat_map(Hand::card_value::<PART2>)
-            .for_each(|ndx| {
+            .fold(0, |value, ndx| {
                 cards[ndx] += 1;
-                value = value * 13 + (13 - ndx) as u64
+                value * 13 + (13 - ndx) as u64
             });
         if PART2 {
             Hand::change_jokers(&mut cards);
@@ -138,18 +135,18 @@ impl PartialEq for Hand {
 
 impl PartialOrd for Hand {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        let ty_ord = self.ty.cmp(&other.ty);
-        let Ordering::Equal = ty_ord else {
-            return Some(ty_ord);
-        };
-        Some(self.value.cmp(&other.value))
+        Some(self.cmp(other))
     }
 }
 
 impl Eq for Hand {}
 impl Ord for Hand {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
+        let ty_ord = self.ty.cmp(&other.ty);
+        let Ordering::Equal = ty_ord else {
+            return ty_ord;
+        };
+        self.value.cmp(&other.value)
     }
 }
 

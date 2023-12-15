@@ -25,11 +25,7 @@ fn extrapolate_back(arr: &mut [i64]) -> i64 {
             break;
         }
     }
-    let mut last_val = 0;
-    for n in &arr[len..] {
-        last_val += n;
-    }
-    last_val
+    arr[len..].iter().sum()
 }
 
 fn extrapolate_front(arr: &mut [i64]) -> i64 {
@@ -49,11 +45,7 @@ fn extrapolate_front(arr: &mut [i64]) -> i64 {
             break;
         }
     }
-    let mut last_val = 0;
-    for n in arr[..pos].iter().rev() {
-        last_val = n - last_val;
-    }
-    last_val
+    arr[..pos].iter().rev().fold(0, |acc, n| n - acc)
 }
 
 #[aoc(part = 1, example = 114)]

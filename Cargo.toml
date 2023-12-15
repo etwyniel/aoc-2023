@@ -9,6 +9,7 @@ edition = "2021"
 aoc-framework = {git = "https://github.com/etwyniel/aoc-framework"}
 fxhash = "0.2.1"
 itertools = "0.10.5"
+smallvec = "1.11.2"
 
 [profile.release]
 debug = 1

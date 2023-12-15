@@ -1,5 +1,3 @@
-use std::io::BufRead;
-
 use aoc_framework::*;
 
 pub struct Day04;
@@ -14,12 +12,24 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
 ");
 
 fn to_mask(numbers: &str) -> u128 {
-    numbers
-        .as_bytes()
-        .split(|&b| b == b' ')
-        .filter(|s| !s.is_empty())
-        .map(|s| s.iter().fold(0, |acc, b| acc * 10 + b - b'0'))
-        .fold(0u128, |mask, n| mask | (1 << n))
+    let mut mask = 0u128;
+    let mut it = numbers.bytes();
+    let mut num = 0;
+    loop {
+        match it.next() {
+            None => {
+                mask |= 1 << num;
+                break;
+            }
+            Some(b' ') if num != 0 => {
+                mask |= 1 << num;
+                num = 0;
+            }
+            Some(b @ b'0'..=b'9') => num = num * 10 + (b - b'0'),
+            _ => {}
+        }
+    }
+    mask
 }
 
 fn num_winning_numbers(winning: &str, numbers: &str) -> usize {
@@ -29,36 +39,30 @@ fn num_winning_numbers(winning: &str, numbers: &str) -> usize {
 }
 
 #[aoc(part = 1, example = 13)]
-fn part1(mut input: impl BufRead) -> u64 {
-    let mut line = String::with_capacity(100);
-    let mut sum = 0;
-    while let Ok(1..) = input.read_line(&mut line) {
-        let card = line.trim_end().splitn(3, ' ').last().unwrap();
-        let (winning, numbers) = card.split_once(" | ").unwrap();
-        let w = num_winning_numbers(winning, numbers);
-        sum += if w == 0 { 0 } else { 1 << (w - 1) };
-        line.clear();
-    }
-    sum
+fn part1(input: impl Iterator<Item = String>) -> u64 {
+    input
+        .flat_map(|line| {
+            let (_, card) = line.split_once(": ")?;
+            let (winning, numbers) = card.split_once(" | ")?;
+            let w = num_winning_numbers(winning, numbers);
+            Some(if w == 0 { 0 } else { 1 << (w - 1) })
+        })
+        .sum()
 }
 
 #[aoc(part = 2, example = 30)]
-fn part2(input: impl Iterator<Item = String>) -> u64 {
-    let mut counts = vec![1];
-    input.enumerate().for_each(|(i, line)| {
+fn part2(input: Vec<String>) -> u64 {
+    let mut counts = vec![1; input.len()];
+    input.into_iter().enumerate().for_each(|(i, line)| {
         let (winning, numbers) = line
             .split_once(": ")
             .and_then(|(_, numbers)| numbers.split_once(" | "))
             .unwrap_or_default();
-        let c = counts.get(i).copied().unwrap_or(1);
-        let w = num_winning_numbers(winning, numbers);
-        while counts.len() < i + w + 1 {
-            counts.push(1);
-        }
+        let c = counts[i];
         counts
             .iter_mut()
             .skip(i + 1)
-            .take(w)
+            .take(num_winning_numbers(winning, numbers))
             .for_each(|count| *count += c)
     });
     counts.into_iter().sum()
