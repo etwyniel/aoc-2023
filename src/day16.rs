@@ -1,4 +1,9 @@
-use aoc_framework::{direction::Direction, grid::{Grid, GridView}, point::Point, *};
+use aoc_framework::{
+    direction::Direction,
+    grid::{Grid, GridView},
+    point::Point,
+    *,
+};
 
 pub struct Day16;
 
@@ -28,34 +33,20 @@ fn count_energized(g: &GridView<'_, u8, 2>, start_pos: Point<2>, start_dir: Dire
             energized.set(pos, true);
             let vertical = dir.delta().x() == 0;
             match b {
-                b'/' => {
-                    if vertical {
-                        dir -= 1;
-                    } else {
-                        dir += 1;
-                    }
-                }
-                b'\\' => {
-                    if vertical {
-                        dir += 1;
-                    } else {
-                        dir -= 1;
-                    }
-                }
+                b'/' if vertical => dir -= 1,
+                b'/' => dir += 1,
+                b'\\' if vertical => dir += 1,
+                b'\\' => dir -= 1,
                 b'-' | b'|' if already_energized => break,
                 b'-' if vertical => {
                     let l = dir + 1;
                     beams.push((pos + l, l));
-                    let r = dir - 1;
-                    beams.push((pos + r, r));
-                    break;
+                    dir -= 1;
                 }
                 b'|' if !vertical => {
                     let l = dir + 1;
                     beams.push((pos + l, l));
-                    let r = dir - 1;
-                    beams.push((pos + r, r));
-                    break;
+                    dir -= 1
                 }
                 _ => (),
             }
@@ -84,11 +75,11 @@ fn part2(input: Vec<u8>) -> u64 {
     };
     for x in 0..w {
         check(x, 0, Direction::SOUTH);
-        check(x, h-1, Direction::NORTH);
+        check(x, h - 1, Direction::NORTH);
     }
     for y in 0..h {
         check(0, y, Direction::EAST);
-        check(w-1, y, Direction::WEST);
+        check(w - 1, y, Direction::WEST);
     }
     max
 }
