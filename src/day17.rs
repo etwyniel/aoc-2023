@@ -1,6 +1,7 @@
 use std::{
-    collections::{HashMap, HashSet, BinaryHeap},
-    hash::Hash, cmp::Reverse,
+    cmp::Reverse,
+    collections::{BinaryHeap, HashMap, HashSet},
+    hash::Hash,
 };
 
 use aoc_framework::{
@@ -84,30 +85,27 @@ fn part1(input: Vec<u8>) -> u64 {
         dir: Direction::EAST,
         count: 0,
     };
-    open_set.push(KeyedBy{v: start_node, o: Reverse(0)});
+    open_set.push(KeyedBy {
+        v: start_node,
+        o: Reverse(0),
+    });
     let mut came_from = HashMap::<Node, Node>::new();
     let mut g_score = HashMap::new();
     g_score.insert(start_node, 0);
     let mut f_score = HashMap::new();
     f_score.insert(start_node, start_node.p.dist_manhattan(end_pos) as u64);
 
-    while let Some(KeyedBy{v: current, ..}) = open_set.pop() {
+    while let Some(KeyedBy { v: current, .. }) = open_set.pop() {
         if current.p == end_pos {
-            let mut disp_g = Grid::from_data(
-                vec![b' '; (g.size().x() * g.size().y()) as usize],
-                g.size().x() as usize,
-            );
             let mut total = (g[end_pos] - b'0') as u64;
             let mut cur = current;
             while let Some(node) = came_from.get(&cur) {
                 if node.p.0 == [0, 0] {
-                    break
+                    break;
                 }
                 total += (g[node.p] - b'0') as u64;
-                disp_g.set(node.p, b'#');
                 cur = *node;
             }
-            disp_g.print_bytes();
             return total;
         }
         for d in 0..4 {
@@ -134,11 +132,11 @@ fn part1(input: Vec<u8>) -> u64 {
                 came_from.insert(neighbor_node, current);
                 g_score.insert(neighbor_node, tentative_score);
                 let f = tentative_score * 100 + neighbor.dist_manhattan(end_pos) as u64;
-                f_score.insert(
-                    neighbor_node,
-                    f,
-                );
-                open_set.push(KeyedBy { v: neighbor_node, o: Reverse(f) });
+                f_score.insert(neighbor_node, f);
+                open_set.push(KeyedBy {
+                    v: neighbor_node,
+                    o: Reverse(f),
+                });
                 // if !open_set.contains(&neighbor_node) {
                 //     open_set.insert(neighbor_node);
                 // }
@@ -158,35 +156,36 @@ fn part2(input: Vec<u8>) -> u64 {
         dir: Direction::EAST,
         count: 0,
     };
-    open_set.push(KeyedBy{v: start_node, o: Reverse(0)});
+    open_set.push(KeyedBy {
+        v: start_node,
+        o: Reverse(0),
+    });
     let mut came_from = HashMap::<Node, Node>::new();
     let mut g_score = HashMap::new();
     g_score.insert(start_node, 0);
     let mut f_score = HashMap::new();
     f_score.insert(start_node, start_node.p.dist_manhattan(end_pos) as u64);
 
-    while let Some(KeyedBy{v: current, ..}) = open_set.pop() {
+    while let Some(KeyedBy { v: current, .. }) = open_set.pop() {
         if current.p == end_pos && current.count >= 4 {
-            let mut disp_g = Grid::from_data(
-                vec![b' '; (g.size().x() * g.size().y()) as usize],
-                g.size().x() as usize,
-            );
             let mut total = (g[end_pos] - b'0') as u64;
             let mut cur = current;
             while let Some(node) = came_from.get(&cur) {
                 if node.p.0 == [0, 0] {
-                    break
+                    break;
                 }
                 total += (g[node.p] - b'0') as u64;
-                disp_g.set(node.p, b'#');
                 cur = *node;
             }
-            disp_g.print_bytes();
             return total;
         }
         for d in 0..4 {
             let dir = Direction::new(d);
-            if (dir != current.dir && current.count < 4) || (dir == current.dir && current.count == 10) || dir == -current.dir {
+            if current.count > 0
+                && ((dir != current.dir && current.count < 4)
+                    || (dir == current.dir && current.count == 10)
+                    || dir == -current.dir)
+            {
                 continue;
             }
             let neighbor = current.p + dir;
@@ -207,12 +206,12 @@ fn part2(input: Vec<u8>) -> u64 {
             if &tentative_score < g_score.get(&neighbor_node).unwrap_or(&1000000) {
                 came_from.insert(neighbor_node, current);
                 g_score.insert(neighbor_node, tentative_score);
-                let f = tentative_score * 1000 + neighbor.dist_manhattan(end_pos)as u64;
-                f_score.insert(
-                    neighbor_node,
-                    f,
-                );
-                open_set.push(KeyedBy { v: neighbor_node, o: Reverse(f) });
+                let f = tentative_score * 1000 + neighbor.dist_manhattan(end_pos) as u64;
+                f_score.insert(neighbor_node, f);
+                open_set.push(KeyedBy {
+                    v: neighbor_node,
+                    o: Reverse(f),
+                });
             }
         }
     }
