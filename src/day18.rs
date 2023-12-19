@@ -1,9 +1,7 @@
-use std::cmp::Ordering;
-
 use aoc_framework::{
     direction::Direction,
     grid::{Grid, GridView},
-    point::{Point, Point2},
+    point::{Point},
     *,
 };
 
